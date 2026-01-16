@@ -2,6 +2,7 @@
 streamlit           # Interface utilisateur online 
 pandas              # Manipulation de données et fichiers Excel 
 openpyxl            # Moteur pour lire/écrire des fichiers Excel (XLSX) 
+plotly
 
 # --- Base de Données ---
 psycopg2-binary     # Connecteur PostgreSQL 
