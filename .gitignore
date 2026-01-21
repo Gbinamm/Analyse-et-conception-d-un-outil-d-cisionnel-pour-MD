@@ -1,0 +1,4 @@
+.coverage
+test_chrome_profile/
+__pycache__/
+*.pyc

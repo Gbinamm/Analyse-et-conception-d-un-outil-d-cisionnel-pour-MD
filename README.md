@@ -63,6 +63,15 @@ INSERT INTO public.solution (num, pos, nature) VALUES
 ALTER TABLE public.entretien ALTER COLUMN origine TYPE character varying(50);
 
 # Lancement des test unitaires, web
+
+Pour lancer l 'application: 
+
+streamlit run app.py
+
+ou 
+
+python -m streamlit run app.py
+
 Pour lancer les test web : 
 
 python test_web/Selenium_test_web.py
@@ -71,8 +80,65 @@ Pour lancer les tests unitaires :
 
 pytest tests_unitaires/ --cov=application
 
+ou 
+
+python -m pytest tests_unitaires/ --cov=application
 
 Changement de la base de donnée: 
 
 TRUNCATE TABLE public.demande, public.solution, public.entretien RESTART IDENTITY CASCADE;
 
+Mise en place de la base de donnée sur supabase : 
+
+1.Sécurité RLS et activation des Policies :
+
+-- 1. Activation du RLS pour les tables de données
+ALTER TABLE public.entretien ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.demande ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.solution ENABLE ROW LEVEL SECURITY;
+
+-- 2. Création des politiques d'accès (Lecture et Écriture pour l'API)
+-- Note : 'anon' est le rôle utilisé par défaut par votre clé publique Supabase.
+
+-- Pour la table entretien
+CREATE POLICY "Autoriser lecture pour l'API" ON public.entretien FOR SELECT TO anon USING (true);
+CREATE POLICY "Autoriser insertion pour l'API" ON public.entretien FOR INSERT TO anon WITH CHECK (true);
+
+-- Pour la table demande
+CREATE POLICY "Autoriser lecture pour l'API" ON public.demande FOR SELECT TO anon USING (true);
+CREATE POLICY "Autoriser insertion pour l'API" ON public.demande FOR INSERT TO anon WITH CHECK (true);
+
+-- Pour la table solution
+CREATE POLICY "Autoriser lecture pour l'API" ON public.solution FOR SELECT TO anon USING (true);
+CREATE POLICY "Autoriser insertion pour l'API" ON public.solution FOR INSERT TO anon WITH CHECK (true);
+
+-- 3. Rendre les tables de métadonnées lisibles
+ALTER TABLE public.modalite ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Lecture publique" ON public.modalite FOR SELECT TO anon USING (true);
+
+-- 1. Synchroniser le compteur des entretiens (numéro 783 actuellement le plus haut)
+SELECT setval('public.entretien_num_seq', (SELECT MAX(num) FROM public.entretien));
+
+-- 2. Synchroniser le compteur des agglomérations
+SELECT setval('public.agglo_code_a_seq', (SELECT MAX(code_a) FROM public.agglo));
+
+-- 3. Synchroniser le compteur des communes
+SELECT setval('public.commune_code_c_seq', (SELECT MAX(code_c) FROM public.commune));
+
+-- 4. Synchroniser le compteur des quartiers
+SELECT setval('public.quartier_code_q_seq', (SELECT MAX(code_q) FROM public.quartier));
+
+-- 5. Synchroniser le compteur des rubriques
+SELECT setval('public.rubrique_pos_seq', (SELECT MAX(pos) FROM public.rubrique));
+
+-- Ajout des colonnes de géolocalisation à la table COMMUNE
+ALTER TABLE public.commune 
+ADD COLUMN IF NOT EXISTS lat FLOAT, 
+ADD COLUMN IF NOT EXISTS lon FLOAT;
+
+-- Vérification : la table COMMUNE contient les noms issus de vos données historiques
+SELECT nom_c, lat, lon FROM public.commune LIMIT 5;
+
+SI les colonnes lat et lon de la base de données Supabase sont vides, faire : 
+
+python enrichir_coords.py
