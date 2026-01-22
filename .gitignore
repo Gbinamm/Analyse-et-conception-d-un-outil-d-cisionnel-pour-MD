@@ -2,3 +2,4 @@
 test_chrome_profile/
 __pycache__/
 *.pyc
+alimentation_supabase.sql
