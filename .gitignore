@@ -1,0 +1,13 @@
+.coverage
+test_chrome_profile/
+__pycache__/
+*.pyc
+data_sensible/
+logs/
+htmlcov/
+*.log
+*.py[cod]
+.ipynb_checkpoints/
+drivers/GoogleChromePortable/
+drivers/*.exe
+

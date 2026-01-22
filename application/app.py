@@ -66,7 +66,7 @@ def local_css(file_name):
     else:
         st.error(f"⚠️ Fichier {file_name} introuvable.")
 
-@st.cache_data(ttl=60)
+
 def get_table_metadata(table_name):
     """Récupère la structure ET les modalités depuis la table 'modalite'"""
     query_cols = f"""
@@ -121,7 +121,7 @@ def process_var_for_stats(df, col_name, metadata):
     """Prépare les données pour le graphique (gestion des multi-choix '|')"""
     if col_name not in df.columns: return pd.Series()
     temp = df[col_name].dropna().astype(str)
-    if temp.str.contains('\|').any():
+    if temp.str.contains(r'\|').any():
         temp = temp.str.split('|').explode()
     return temp.apply(lambda x: clean_val_with_meta(col_name, x, metadata))
 
@@ -167,7 +167,8 @@ def main_ui():
     if 'choice' not in st.session_state:
         st.session_state.choice = "Ajouter Entretien"
 
-# REMPLACEMENT DU BLOC SIDEBAR (Lignes 186 à 213 environ)
+    # REMPLACEMENT DU BLOC SIDEBAR (Lignes 186 à 213 environ)
+
     with st.sidebar:
         st.image("Image/Maison_droit.png", use_container_width=True)
         st.markdown("---")
