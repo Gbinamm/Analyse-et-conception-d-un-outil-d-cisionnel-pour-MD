@@ -34,6 +34,9 @@ def run_selenium_test():
     chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument(f"--user-data-dir={tmp_profile}")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--proxy-server='direct://'")
+    chrome_options.add_argument("--proxy-bypass-list=*")
 
     driver = webdriver.Chrome(service=Service(chromedriver_path), options=chrome_options)
     wait = WebDriverWait(driver, 25)
